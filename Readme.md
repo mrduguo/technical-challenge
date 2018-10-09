@@ -107,3 +107,8 @@ awsEbOverrideExistsEnv=true \
 * [sample output](/src/doc/sample-build-logs/aws-build-and-deploy-all-in-one.log)
 * the build output log will contain the service url
 * [the zero downtime build and deployment process](/src/doc/the-zero-downtime-build-and-deployment-process.md)
+
+
+
+
+curl -v "http://0.0.0.0:8080/v1/?input={%22colors%22:1,%22customers%22:2,%22demands%22:[[1,1,1],[1,1,0]]}"
