@@ -27,4 +27,9 @@ class AbstractSpec extends Specification {
         new TestRestTemplate().getForEntity(url(path), responseType,urlVariables)
     }
 
+
+    public <T> ResponseEntity<T> postForEntity(String path, def payload, Class<T> responseType, Object... urlVariables){
+        new TestRestTemplate().postForEntity(url(path),payload, responseType,urlVariables)
+    }
+
 }
