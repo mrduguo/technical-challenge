@@ -2,8 +2,3 @@ server:
   port: 8888
 management:
   context-path: /v1/serviceability
-zuul:
-  routes:
-    github:
-      path: /proxy/github/**
-      url: https://api.github.com

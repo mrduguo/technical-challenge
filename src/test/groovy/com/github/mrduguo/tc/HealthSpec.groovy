@@ -1,4 +1,4 @@
-package com.github.mrduguo.gradle.sampleapp
+package com.github.mrduguo.tc
 
 import org.springframework.http.HttpStatus
 
