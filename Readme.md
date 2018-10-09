@@ -1,40 +1,109 @@
-# Paint batch optimizer service
+# gradle sample app project  [![Build Status](https://travis-ci.org/mrduguo/gradle-sample-app.svg?branch=master)](https://travis-ci.org/mrduguo/gradle-sample-app)
+A demo for spring boot based app based on [mrduguo/gradle-buildscript](https://github.com/mrduguo/gradle-buildscript) project. 
 
-## Purpose
 
-This service provides solutions for the following problem.
+## Requirements
 
-Our users own paint factories. There are N different colors they can mix, and each color can be prepared "matte" or "glossy". So, you can make 2N different types of paint.
+* JAVA 7 or newer
+* Docker (optional, to use `-x docker` to skip if you don't have docker installed)
 
-Each of their customers has a set of paint types they like, and customers will be satisfied if you have at least one of those types prepared. At most one of the types a customer likes will be a "matte".
 
-Our user wants to make N batches of paint, so that:
+## sample build command
 
-There is exactly one batch for each color of paint, and it is either matte or glossy. For each customer, user makes at least one paint that they like. The minimum possible number of batches are matte (since matte is more expensive to make). This service finds whether it is possible to satisfy all customers given these constraints, and if it is, what paint types you should make. If it is possible to satisfy all your customers, there will be only one answer which minimizes the number of matte batches.
+#### build artifact locally
 
-Input
+```
+./gradlew
+```
 
-Integer N, the number of paint colors,  integer M, the number of customers. A list of M lists, one for each customer, each containing: An integer T >= 1, the number of paint types the customer likes, followed by T pairs of integers "X Y", one for each type the customer likes, where X is the paint color between 1 and N inclusive, and Y is either 0 to indicate glossy, or 1 to indicated matte. Note that: No pair will occur more than once for a single customer. Each customer will have at least one color that they like (T >= 1). Each customer will like at most one matte color. (At most one pair for each customer has Y = 1). 
+* [sample output](/src/doc/sample-build-logs/default-build.log)
 
-Output
+#### run the application directly without build
 
-The string "IMPOSSIBLE", if the customers' preferences cannot be satisfied; OR N space-separated integers, one for each color from 1 to N, which are 0 if the corresponding paint should be prepared glossy, and 1 if it should be matte.
+```
+./gradlew run
+```
 
-## Usage
+* [sample output](/src/doc/sample-build-logs/run.log)
 
-In the `app` directory you will see a small Python web service (`app.py`), a dependency list (`requirements.txt`) and a `Makefile`. The `Makefile` contains 2 targets: `build` that just installs the requirements into the current Python environment, and `run` which runs an example instance of the application.
+Then the app can be accessed from:
 
-The application has a primary endpoint at `/v1/`. When you make calls to this endpoint, you can send a JSON string as the argument "input". The JSON string contains three keys: colors, costumers and demands.
+* [http://localhost:8888](http://localhost:8888)
 
-Examples:
+#### run the docker image
 
-http://0.0.0.0:8080/v1/?input={%22colors%22:1,%22customers%22:2,%22demands%22:[[1,1,1],[1,1,0]]}
-IMPOSSIBLE
+```
+docker run -it --rm -p 8888:8888 gradle-sample-app
+```
 
-http://0.0.0.0:8080/v1/?input={%22colors%22:5,%22customers%22:3,%22demands%22:[[1,1,1],[2,1,0,2,0],[1,5,0]]}
-1 0 0 0 0
+Then the app can be accessed from:
 
-## Limitations
+* [http://192.168.99.100:8888/](http://192.168.99.100:8888/) or [http://127.0.0.1:8888/](http://127.0.0.1:8888/)
 
-None of our users produce more than 2000 different colors, or have more than 2000 customers. (1 <= N <= 2000 1 <= M <= 2000)
-The sum of all the T values for the customers in a request will not exceed 3000.
+The image also pushed as [mrduguo/gradle-sample-app](https://hub.docker.com/r/mrduguo/gradle-sample-app/) in docker hub.
+
+## continious integration build
+
+https://travis-ci.org/mrduguo/gradle-sample-app
+
+It run the same build command as locally, but with `JOB_NAME` environment variable to deploy the artifact to remote bintray maven repository instead of local file system.
+
+* [sample output](https://travis-ci.org/mrduguo/gradle-sample-app/builds/126996208)
+
+#### released artifact
+
+https://dl.bintray.com/mrduguo/maven/com/github/mrduguo/gradle/gradle-sample-app/
+
+After download a released jar file, you may run it with:
+
+
+```
+java -jar gradle-sample-app-*.jar
+```
+
+The app then can be accessed from:
+
+* [http://localhost:8888](http://localhost:8888)
+
+
+## aws deploy
+
+This require you have `~/.aws/credentials` configured
+
+#### the default aws build which will upload artifact to s3
+
+```
+
+mavenReleaseRepoUrl=https://s3-eu-west-1.amazonaws.com/elasticbeanstalk-eu-west-1-349318639323/maven-repo/ \
+./gradlew
+
+```
+
+* [sample output](/src/doc/sample-build-logs/aws-build.log)
+
+#### deploy latest build to elastic beanstalk
+
+```
+
+mavenReleaseRepoUrl=https://s3-eu-west-1.amazonaws.com/elasticbeanstalk-eu-west-1-349318639323/maven-repo/ \
+awsEbOverrideExistsEnv=true \
+./gradlew aws_eb_deploy 
+
+```
+
+* [sample output](/src/doc/sample-build-logs/aws-deploy.log)
+
+
+#### build and deploy all in one
+
+```
+
+mavenReleaseRepoUrl=https://s3-eu-west-1.amazonaws.com/elasticbeanstalk-eu-west-1-349318639323/maven-repo/ \
+awsEbOverrideExistsEnv=true \
+./gradlew clean build aws_eb_deploy
+ 
+```
+
+* [sample output](/src/doc/sample-build-logs/aws-build-and-deploy-all-in-one.log)
+* the build output log will contain the service url
+* [the zero downtime build and deployment process](/src/doc/the-zero-downtime-build-and-deployment-process.md)
