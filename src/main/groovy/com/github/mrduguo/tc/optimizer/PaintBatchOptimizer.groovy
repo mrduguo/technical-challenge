@@ -7,6 +7,7 @@ class PaintBatchOptimizer {
 
     Answer solve(Problem problem){
         new Answer()
+        //TODO:  to implement the actual algorithm
     }
 
 //
