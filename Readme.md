@@ -83,11 +83,28 @@ After the deploy finished, you can verify the application from the built-in info
 * [sample output](/src/doc/sample-build-logs/aws-build-and-deploy-all-in-one.log)
 
 
+
+#### API Version 1
+
+
+```
+
+curl 'http://lab-tc.eu-west-1.elasticbeanstalk.com/v1/?input=\{%22colors%22:1,%22customers%22:2,%22demands%22:\[\[1,1,1\],\[1,1,0\]\]\}'
+
+```
+
+
 #### API Version 2
 
 
 ```
 
-curl  http://0.0.0.0:8080/v2/ -H 'Content-Type: application/json' -d '{"colors":5,"customers":3,"demands":[[1,1,1],[2,1,0,2,0],[1,5,0]]}'
+curl  http://lab-tc.eu-west-1.elasticbeanstalk.com/v2/ -H 'Content-Type: application/json' -d '{"colors":1,"customers":2,"demands":[[1,1,1],[1,1,0]]}'
 
 ```
+
+#### Serviceability Endpoints
+
+* http://lab-tc.eu-west-1.elasticbeanstalk.com/v1/serviceability/info
+* http://lab-tc.eu-west-1.elasticbeanstalk.com/v1/serviceability/health
+* http://lab-tc.eu-west-1.elasticbeanstalk.com/v1/serviceability/metrics

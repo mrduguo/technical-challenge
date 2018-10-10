@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-public class V2RestController {
+class V2RestController {
 
     @Autowired
     PaintBatchOptimizer paintBatchOptimizer

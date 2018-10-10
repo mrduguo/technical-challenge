@@ -10,15 +10,15 @@ class DataFileBasedUseCasesSpec extends AbstractSpec {
 
 
     @Unroll
-    def "test case ##testCaseId with colors #colors customers #customers"(int testCaseId, int colors, int customers,
-                                                                          def demands, String expectedResult) {
+    def "test case ##testCaseId with colors #colors customers #customers"(
+            int testCaseId, int colors, int customers, def demands, String expectedResult) {
         when:
         def payload = [colors: colors, customers: customers, demands: demands]
         def entity = getForEntity('/v1/?input=' + UriUtils.encodeQueryParam(new JsonBuilder(payload).toString(),'US-ASCII'), String.class)
 
         then:
         entity.statusCode == HttpStatus.OK
-        //entity.body == expectedResult
+        entity.body == expectedResult
 
 
         where:

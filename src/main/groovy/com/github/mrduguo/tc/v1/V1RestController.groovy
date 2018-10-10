@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.util.UriUtils
 
 @RestController
-public class V1RestController {
+class V1RestController {
 
     @Autowired
     PaintBatchOptimizer paintBatchOptimizer

@@ -1,3 +1,4 @@
+
 package com.github.mrduguo.tc.optimizer
 
 import org.springframework.stereotype.Component
@@ -5,85 +6,95 @@ import org.springframework.stereotype.Component
 @Component
 class PaintBatchOptimizer {
 
-    Answer solve(Problem problem){
-        new Answer()
-        //TODO:  to implement the actual algorithm
+    Answer solve(Problem problem) {
+        def mattes = []
+        def glossy = [:]
+        (0..<problem.customers).each { c ->
+            mattes << []
+            (0..<problem.demands[c][0]).each { i ->
+                def color = problem.demands[c][2 * i + 1]
+                def matte = problem.demands[c][2 * i + 2]
+                if (matte == 1)
+                    glossy[c] = color - 1
+                else
+                    mattes[c] << color - 1
+            }
+        }
+        def (solved, solution) = start(problem.colors, problem.customers, mattes, glossy)
+        new Answer(impossible: !solved, solution: solution)
     }
 
-//
-//
-//def solver(problem):
-//    colors = problem.get("colors")
-//    customers = problem.get("customers")
-//    demands = problem.get("demands")
-//
-//    mattes = []
-//    glossy = {}
-//    for c in range(customers):
-//        length = demands[c][0]
-//        demand = demands[c][1:]
-//        mattes.append([])
-//        for i in range(length):
-//            (color, matte) = (demand[2 * i], demand[2 * i + 1])
-//            if matte == 1:
-//                glossy[c] = color - 1
-//            else:
-//                mattes[c].append(color - 1)
-//    solved, solution = start(colors, customers, mattes, glossy)
-//    if solved:
-//        return " ".join(map(str, solution))
-//    else:
-//        return "IMPOSSIBLE"
-//
-//
-//def check(solution, customers, mattes, glossy):
-//    for customer in range(customers):
-//        good = False
-//        for i in range(len(solution)):
-//            if solution[i] == 0 and i in mattes[customer]:
-//                good = True
-//            if solution[i] == 1 and glossy.get(customer) == i:
-//                good = True
-//        if not good:
-//            return False
-//    return True
-//
-//
-//def start(colors, customers, mattes, glossy):
-//    solution = [0] * colors
-//    if check(solution, customers, mattes, glossy):
-//        return True, solution
-//    result = None
-//    solved = False
-//    for i in range(len(solution)):
-//        if solution[i] == 0:
-//            solved_i, result_i = reduce(solution, i, customers, mattes, glossy)
-//            if solved_i:
-//                if not solved:
-//                    solved = True
-//                    result = result_i
-//                if sum(result_i) < sum(result):
-//                    result = result_i
-//    return solved, result
-//
-//def reduce(solution_on_stack, change, customers, mattes, glossy):
-//    solution = list(solution_on_stack)
-//    solution[change] = 1
-//    if check(solution, customers, mattes, glossy):
-//        return True, solution
-//    if sum(solution) == len(solution):
-//        return False, None
-//    result = None
-//    solved = False
-//    for i in range(len(solution)):
-//        if solution[i] == 0:
-//            solved_i, result_i = reduce(solution, i, customers, mattes, glossy)
-//            if solved_i:
-//                if not solved:
-//                    solved = True
-//                    result = result_i
-//                if sum(result_i) < sum(result):
-//                    result = result_i
-//    return solved, result
-//
+    def start(int colors, int customers, mattes, glossy) {
+        def solution = [0] * colors
+        if (check(solution, customers, mattes, glossy))
+            return [true, solution]
+        def result = null
+        def solved = false
+        (0..<colors).each { i ->
+            if (solution[i] == 0) {
+                def (solved_i, result_i) = reduce(solution, i, customers, mattes, glossy)
+                if (solved_i) {
+                    if (!solved) {
+                        solved = true
+                        result = result_i
+                    }
+                    if (result_i.sum() < result.sum()) {
+                        result = result_i
+                    }
+                }
+
+            }
+        }
+        return [solved, result]
+    }
+
+
+    def check(solution, customers, mattes, glossy) {
+        for (int customer = 0; customer < customers; customer++) {
+            def good = false
+            (0..<solution.size()).each { i ->
+                if (solution[i] == 0 && i in mattes[customer]) {
+                    good = true
+                }
+                if (solution[i] == 1 && glossy.get(customer) == i) {
+                    good = true
+                }
+            }
+            if (!good) {
+                return false
+            }
+        }
+        true
+    }
+
+
+    def reduce(solution_on_stack, change, customers, mattes, glossy) {
+        def solution = solution_on_stack.collect()
+        solution[change] = 1
+        if (check(solution, customers, mattes, glossy)) {
+            return [true, solution]
+        }
+        if (solution.sum() == solution.size()) {
+            return [false, null]
+        }
+        def result = null
+        def solved = false
+        (0..<solution.size()).each { i ->
+            if (solution[i] == 0) {
+                def (solved_i, result_i) = reduce(solution, i, customers, mattes, glossy)
+                if (solved_i) {
+                    if (!solved) {
+                        solved = true
+                        result = result_i
+                    }
+                    if (result_i.sum() < result.sum()) {
+                        result = result_i
+                    }
+                }
+            }
+        }
+        return [solved, result]
+    }
+
 }
+
